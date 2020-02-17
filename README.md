@@ -23,3 +23,33 @@ Quoting directly from the abstract of the paper:
 
 ## Measuring the causal impact of mentioning an unusual term on a popular brazilian TV show
 
+## 1. Gathering the data
+
+We are going to download the data from Google Trends. 
+
+There are two main ways of doing this:
+- We can navigate to the [website](https://trends.google.com/trends/?geo=BR) and specify which term we are looking for, the region and timeframe
+- We can do this directly in Python, using a third-party library such as [pytrends](https://github.com/GeneralMills/pytrends)
+
+From the causal impact presentation, the author of the package suggests that we use between 5 to 10 related time series that can help model the behaviour of our time series of interest.
+
+Therefore, we are going to download several common brazilian terms at the same time frames that may help our bayesian structural time series model in understanding the behaviour of the searches of our target term.
+
+```python
+# pytrends code to save our queries
+```
+
+## 2. Organizing the data
+
+```python
+# pandas code to aggregate the data in a single dataframe
+```
+
+## 3. Causal Impact
+
+```python
+# causal impact code
+```
+
+## Final thoughts
+
