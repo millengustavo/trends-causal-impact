@@ -6,11 +6,11 @@
 
 ## Motivation
 
-At work, you are responsible of taking many decisions that can impact several aspects of the business in different ways. Most of the time there are simple approaches of measuring the impact of those decisions. 
+At work, you are responsible for making many decisions that can impact aspects of your business in different ways. Most of the time, there are simple approaches to measure the impact of these decisions.
 
-You launched an advertising campaign and analyzing the sales that are up 5% one month later you conclude your campaign was a success. Right? Well, did you run a randomized experiment? Did you account for other factors such as seasonality or trend of the sales? 
+You launched an advertising campaign and, looking at sales that increased by 5% a month later, concluded that your campaign was a success. Right? Well, did you do a random experiment? Did you consider other factors such as seasonality or sales trend?
 
-Similar to that scenario, there are a pletora of other cases where we may be interested in measuring the causal impact of one's action.
+Similar to this scenario, there are a plethora of other cases in which we may be interested in measuring the causal impact of the action.
 
 ## Causal Impact by Google
 
@@ -24,8 +24,14 @@ Quoting directly from the abstract of the paper:
 ## Measuring the causal impact of mentioning an unusual term on a popular brazilian TV show
 
 ## Context
-Big Brother Brasil (BBB) is a popular brazilian TV show that is broadcasted in open television at prime time. One of the participants has incentivized live the search for an uncommon word: "Sororidade" ("sorority")
-https://www.uol.com.br/universa/noticias/redacao/2020/02/11/sororidade-buscas-no-google-crescem-250-apos-fala-de-manu-gavassi-no-bbb.htm
+Big Brother Brasil (BBB) is an international TV show that is popular in Brazil and broadcaste on prime time open television. One of the participants suggested, live, that another participant search Google for an unusual term that she had spoken. The unusual word was "Sororidade" ("sorority").
+
+[Many](https://www.uol.com.br/universa/noticias/redacao/2020/02/11/sororidade-buscas-no-google-crescem-250-apos-fala-de-manu-gavassi-no-bbb.htm
+) [media](https://www.huffpostbrasil.com/entry/sororidade-manu-gavassi_br_5e442423c5b61b84d3438b88) [outlets](https://emais.estadao.com.br/noticias/tv,bbb-20-buscas-por-sororidade-no-google-sobem-250-apos-fala-de-manu-gavassi,70003193892) later reported that the episode caused searches for the term to increase 250%.
+
+The episode took place on February 9, 2020 between 9 pm and 10 pm.
+
+Let's investigate the causality of the intervention in increasing interest in the term based on Google trends.
 
 ## 1. Gathering the data
 
@@ -40,9 +46,9 @@ To install `pytrends`, switch to your preferred environment and run the command:
 pip install pytrends
 ```
 
-From the causal impact presentation, the author of the package suggests that we use between 5 to 10 related time series that can help model the behaviour of our time series of interest.
+From the presentation of the causal impact, the author of the package suggests that we use between 5 and 10 related time series that can help to model the behavior of our time series of interest.
 
-Therefore, we are going to download several common brazilian terms at the same time frames that may help our bayesian structural time series model in understanding the behaviour of the searches of our target term.
+Therefore, we are going to download some common Brazilian terms in the same period that may help our Bayesian structural time series model to understand the research behavior of our target term.
 
 ```python
 from pytrends.request import TrendReq
@@ -78,7 +84,7 @@ plt.xticks(rotation=45)
 ![interest_over_time](assets/interest_over_time.png)
 
 ```python
-# changing the zeroes to 0.1 so the model converge
+# changing the zeros to 0.1 so the model converge
 df["sororidade"] = df["sororidade"].apply(lambda x: 0.1 if x==0 else x)
 ```
 
@@ -112,9 +118,23 @@ ci.plot()
 
 ![sororidade_plots](assets/sororidade_plots.png)
 
-Just by looking at the sorority interest over time plot we may have concluded that it was obvious the causal effect. So, let's look at another example to consolidate our understanding.
+Just by looking at the sorority interest over time plot we may have concluded that it was obvious the causal effect. 
 
-## Another example - Amazon rainforest burns
+Let's look at another example to consolidate our understanding.
+
+# Another example - Amazon rainforest burns
+
+## Context
+From [wikipedia](https://pt.wikipedia.org/wiki/Inc%C3%AAndios_florestais_na_Amaz%C3%B4nia_em_2019):
+> "The forest fires in the Amazon in 2019 were a series of forest fires that affected South America, mainly Brazil. At least 161.236 fires were recorded in the country from January to October 2019, 45% more compared to the same period in 2018, which reached 84% in August"
+
+Also from the same article:
+> "**On August 11, Amazonas declared a state of emergency**. NASA images showed that on August 13, smoke from fires was visible from space [...]"
+
+We will set August 11, 2019 as the intervention period for our causality study.
+
+## Causal Impact
+
 ```python
 kw_list = ["Amazônia", "Pantanal", "Cerrado", "Caatinga", "Pampas"]
 pytrends.build_payload(kw_list, cat=0, timeframe='2019-03-01 2020-01-01')
@@ -164,6 +184,6 @@ ci.plot()
 
 ## Final thoughts
 
-The examples shown here help illustrate the concept and the package's API.
+The examples shown here help to illustrate the concept and API of the package.
 
-I encourage you to go beyond and try to come up with business scenarios where these kind of reports can be useful. At work, I had no problem finding these scenarios and it is your duty as a Data Scientist to provide value guided by data where you judge fit.
+I invite you to go further and try to create business scenarios in which this type of report can be useful. At work, I had no trouble finding these scenarios and it is your duty, as a data scientist, to provide data-driven value where you deem it appropriate.
