@@ -14,7 +14,7 @@ Similar to this scenario, there are a plethora of other cases in which we may be
 
 ## Causal Impact by Google
 
-There are some complex aspects of infering the causality of an intervention. In 2015 some awesome employees from Google, published a paper entitled: "*INFERRING CAUSAL IMPACT USING BAYESIAN STRUCTURAL TIME-SERIES MODELS*".
+There are some complex aspects of infering the causality of an intervention. In 2015 some awesome researchers from Google, published a paper entitled: "*INFERRING CAUSAL IMPACT USING BAYESIAN STRUCTURAL TIME-SERIES MODELS*".
 
 Along with the paper they also introduced [CausalImpact](https://google.github.io/CausalImpact/CausalImpact.html), an R package (there is also a [Python port by Dafiti](https://github.com/dafiti/causalimpact)) that implements their approach. In this tutorial we are going to use the Python version.
 
@@ -24,12 +24,12 @@ Quoting directly from the abstract of the paper:
 ## Measuring the causal impact of mentioning an unusual term on a popular brazilian TV show
 
 ## Context
-Big Brother Brasil (BBB) is an international TV show that is popular in Brazil and broadcaste on prime time open television. One of the participants suggested, live, that another participant search Google for an unusual term that she had spoken. The unusual word was "Sororidade" ("sorority").
+Big Brother Brasil (BBB) is an international TV show that is popular in Brazil and broadcast on prime time open television. One of the participants suggested, live, that another participant search Google for an unusual term that she had spoken. The unusual word was "sororidade" ("sorority").
 
 [Many](https://www.uol.com.br/universa/noticias/redacao/2020/02/11/sororidade-buscas-no-google-crescem-250-apos-fala-de-manu-gavassi-no-bbb.htm
 ) [media](https://www.huffpostbrasil.com/entry/sororidade-manu-gavassi_br_5e442423c5b61b84d3438b88) [outlets](https://emais.estadao.com.br/noticias/tv,bbb-20-buscas-por-sororidade-no-google-sobem-250-apos-fala-de-manu-gavassi,70003193892) later reported that the episode caused searches for the term to increase 250%.
 
-The episode took place on February 9, 2020 between 9 pm and 10 pm.
+The episode took place on February 9, 2020 between 9 pm and 10 pm Brazilian time.
 
 Let's investigate the causality of the intervention in increasing interest in the term based on Google trends.
 
@@ -48,7 +48,7 @@ pip install pytrends
 
 From the presentation of the causal impact, the author of the package suggests that we use between 5 and 10 related time series that can help to model the behavior of our time series of interest.
 
-Therefore, we are going to download some common Brazilian terms in the same period that may help our Bayesian structural time series model to understand the research behavior of our target term.
+Therefore, we are going to download some common Brazilian terms in the same period that may help our Bayesian structural time series model to understand the search behavior of our target term.
 
 ```python
 from pytrends.request import TrendReq
@@ -104,11 +104,15 @@ ci = CausalImpact(df, pre_period, post_period)
 print(ci.summary())
 ```
 
+Calling the summary method on the CausalImpact object we obtain a numerical summary of the analysis.
+
 ![ci_summary](assets/ci_summary.png)
 
 ```python
 print(ci.summary(output='report'))
 ```
+
+For additional guidance about the correct interpretation of the summary table, the package provides a verbal interpretation, printed using the same method but with `output="report"`.
 
 ![ci_report](assets/ci_report.png)
 
@@ -116,9 +120,14 @@ print(ci.summary(output='report'))
 ci.plot()
 ```
 
+Explaining the plots, in the package documentation:
+> "By default, the plot contains three panels. The first panel shows the data and a counterfactual prediction for the post-treatment period. The second panel shows the difference between observed data and counterfactual predictions. This is the pointwise causal effect, as estimated by the model. The third panel adds up the pointwise contributions from the second panel, resulting in a plot of the cumulative effect of the intervention."
+
 ![sororidade_plots](assets/sororidade_plots.png)
 
-Just by looking at the sorority interest over time plot we may have concluded that it was obvious the causal effect. 
+Just by looking at the *sorority* interest over time plot we may have concluded that it was obvious the causal effect. 
+
+In addition, the CausalImpact report is somewhat misleading: our series had a lot of zeros, as it is an unusual term and we have counted the metrics of interest from Google trends over time. Because of this, all changes are greatly expanded, and this reflects the increase of `+6735.8%` in the response variable.
 
 Let's look at another example to consolidate our understanding.
 
@@ -142,13 +151,13 @@ pytrends.build_payload(kw_list, cat=0, timeframe='2019-03-01 2020-01-01')
 df = pytrends.interest_over_time()
 ```
 
-| date                |   Amazônia |   Pantanal |   Cerrado |   Caatinga |   Pampas | isPartial   |
-|:--------------------|-----------:|-----------:|----------:|-----------:|---------:|:------------|
-| 2019-03-03 00:00:00 |          3 |         12 |        39 |          2 |       14 | False       |
-| 2019-03-10 00:00:00 |          4 |         12 |        42 |          4 |       13 | False       |
-| 2019-03-17 00:00:00 |          5 |         13 |        43 |          4 |       14 | False       |
-| 2019-03-24 00:00:00 |          5 |         13 |        42 |          4 |       15 | False       |
-| 2019-03-31 00:00:00 |          5 |         13 |        42 |          4 |       13 | False       |
+| date                | Amazônia | Pantanal | Cerrado | Caatinga | Pampas | isPartial |
+| :------------------ | -------: | -------: | ------: | -------: | -----: | :-------- |
+| 2019-03-03 00:00:00 |        3 |       12 |      39 |        2 |     14 | False     |
+| 2019-03-10 00:00:00 |        4 |       12 |      42 |        4 |     13 | False     |
+| 2019-03-17 00:00:00 |        5 |       13 |      43 |        4 |     14 | False     |
+| 2019-03-24 00:00:00 |        5 |       13 |      42 |        4 |     15 | False     |
+| 2019-03-31 00:00:00 |        5 |       13 |      42 |        4 |     13 | False     |
 
 ![iot_amazon](assets/iot_amazon.png)
 
@@ -182,8 +191,20 @@ ci.plot()
 
 ![amazon_plots](assets/amazon_plots.png)
 
+Here we have something closer to what we find on a daily basis, but still a little exaggerated.
+
+We see that the percentage increase in the response variable after the intervention was `+51.24%` and this change was statistically significant.
+
 ## Final thoughts
 
 The examples shown here help to illustrate the concept and API of the package.
 
 I invite you to go further and try to create business scenarios in which this type of report can be useful. At work, I had no trouble finding these scenarios and it is your duty, as a data scientist, to provide data-driven value where you deem it appropriate.
+
+#### References
+- https://google.github.io/CausalImpact/CausalImpact.html
+- https://github.com/dafiti/causalimpact
+- https://www.uol.com.br/universa/noticias/redacao/2020/02/11/sororidade-buscas-no-google-crescem-250-apos-fala-de-manu-gavassi-no-bbb.htm
+- https://www.huffpostbrasil.com/entry/sororidade-manu-gavassi_br_5e442423c5b61b84d3438b88
+- https://emais.estadao.com.br/noticias/tv,bbb-20-buscas-por-sororidade-no-google-sobem-250-apos-fala-de-manu-gavassi,70003193892
+- https://pt.wikipedia.org/wiki/Inc%C3%AAndios_florestais_na_Amaz%C3%B4nia_em_2019
